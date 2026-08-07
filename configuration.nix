@@ -44,7 +44,7 @@
 
   users.users.seoz = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "docker" "video" "render" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tree
     ];
@@ -65,6 +65,11 @@
     zed-editor
     btop
     vlc
+    ghostty
+    fuzzel
+    waybar
+    swaync
+    mangowc
   ];
 
 
@@ -94,6 +99,8 @@
   hardware.bluetooth.enable = true;
   services.flatpak.enable = true;
   # system.copySystemConfiguration = true;
+  services.displayManager.ly.enable = true;
+  virtualisation.docker.enable = true;
 
   programs.nix-ld = {
     enable = true;
@@ -102,6 +109,24 @@
       expat
     ];
   };
+
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50; # Uses up to 50% of your RAM for compressed swap space
+  };
+
+  nix.settings.auto-optimise-store = true; # Deduplicates identical files in the Nix store
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+
+  services.thermald.enable = true; # Keeps Intel CPUs cool
+  powerManagement.cpuFreqGovernor = lib.mkDefault "performance"; # Or "powersave" if on a laptop
+
+  
 
   # !!!DO NOT TOUCH!!!
   system.stateVersion = "25.11"; # Did you read the comment?
