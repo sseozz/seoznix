@@ -70,6 +70,10 @@
     waybar
     swaync
     mangowc
+    grim
+    slurp
+    satty
+    wl-clipboard
   ];
 
 
