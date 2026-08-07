@@ -93,6 +93,8 @@
   nixpkgs.config.allowUnfree = true;
 
   hardware.graphics.enable = true;
+  hardware.amdgpu.opencl.enable = true;
+  hardware.graphics.enable32Bit = true;
 
   services.openssh.enable = true;
   services.envfs.enable = true;
