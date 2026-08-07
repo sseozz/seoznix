@@ -35,14 +35,6 @@
     keyMap = "us";
   };
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.xfce.enable = true;
-
-  
-
-  services.xserver.xkb.layout = "us";
-
 
   services.pipewire = {
     enable = true;
@@ -65,21 +57,14 @@
     git
     fastfetch
     dysk
-    orchis-theme
-    whitesur-icon-theme
-    rofi
     bibata-cursors
-    picom
-    kitty
     bluetui
     wiremix
     nerd-fonts.jetbrains-mono
-    (obs-studio.override { cudaSupport = true; })
+    obs-studio
     zed-editor
     btop
     vlc
-    gearlever
-    appimage-run
   ];
 
 
@@ -101,30 +86,8 @@
   };
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.nvidia.acceptLicense = true; # Add this line right here!
 
   hardware.graphics.enable = true;
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  hardware.nvidia = {
-    modesetting.enable = true;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
-    open = false; 
-    nvidiaSettings = true;
-    gsp.enable = false; 
-    
-    package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-      version = "580.142";
-      sha256_64bit = "sha256-IJFfzz/+icNVDPk7YKBKKFRTFQ2S4kaOGRGkNiBEdWM="; 
-      settingsSha256 = "sha256-BnrIlj5AvXTfqg/qcBt2OS9bTDDZd3uhf5jqOtTMTQM=";
-      persistencedSha256 = "sha256-BnrIlj5AvXTfqg/qcBt2OS9bTDDZd3uhf5jqOtTMTQM=";
-      
-      postPatch = ''
-        find . -name "nv-linux.h" -exec sed -i '/linux\/of_gpio.h/d' {} +
-      '';
-    };
-  };
 
   services.openssh.enable = true;
   services.envfs.enable = true;
