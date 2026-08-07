@@ -64,7 +64,7 @@
     obs-studio
     zed-editor
     btop
-    vlc
+    mpv
     ghostty
     fuzzel
     waybar
