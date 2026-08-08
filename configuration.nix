@@ -38,6 +38,8 @@
 
   services.pipewire = {
     enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
     pulse.enable = true;
   };
 
@@ -130,7 +132,8 @@
   };
 
   services.thermald.enable = true; # Keeps Intel CPUs cool
-  powerManagement.cpuFreqGovernor = lib.mkDefault "performance"; # Or "powersave" if on a laptop
+  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  hardware.cpu.intel.updateMicrocode = true;
 
   
 
