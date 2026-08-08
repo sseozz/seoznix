@@ -2,7 +2,7 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [ 
       ./hardware-configuration.nix
       (builtins.fetchGit { url = "https://github.com/FlameFlag/nixcord.git"; ref = "main"; } + /modules/nixos)
     ];
@@ -21,7 +21,7 @@
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
   
-  networking.hostName = "nixos-btw"; # Define your hostname.
+  networking.hostName = "nixos-btw";
 
   networking.networkmanager.enable = true;
   
@@ -121,17 +121,17 @@
   zramSwap = {
     enable = true;
     algorithm = "zstd";
-    memoryPercent = 50; # Uses up to 50% of your RAM for compressed swap space
+    memoryPercent = 50;
   };
 
-  nix.settings.auto-optimise-store = true; # Deduplicates identical files in the Nix store
+  nix.settings.auto-optimise-store = true;
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 7d";
   };
 
-  services.thermald.enable = true; # Keeps Intel CPUs cool
+  services.thermald.enable = true;
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = true;
 
