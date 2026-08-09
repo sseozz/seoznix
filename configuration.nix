@@ -7,8 +7,8 @@
       (builtins.fetchGit { url = "https://github.com/FlameFlag/nixcord.git"; ref = "main"; } + /modules/nixos)
     ];
 
-  boot.loader.limine = {
-    enable = true;
+  boot.loader.limine.enable = true;
+  boot.loader.efi = {
     canTouchEfiVariables = true;
     efiSysMountPoint = "/boot/efi";
   };
