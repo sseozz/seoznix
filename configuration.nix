@@ -7,19 +7,13 @@
       (builtins.fetchGit { url = "https://github.com/FlameFlag/nixcord.git"; ref = "main"; } + /modules/nixos)
     ];
 
-  boot.loader.grub = {
+  boot.loader.limine = {
     enable = true;
-    efiSupport = true;
-    device = "nodev";
-    useOSProber = true;
-  };
-
-  boot.loader.efi = { 
     canTouchEfiVariables = true;
     efiSysMountPoint = "/boot/efi";
   };
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_zen;
   
   networking.hostName = "nixos-btw";
 
@@ -46,7 +40,7 @@
 
   users.users.seoz = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "video" "render" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "docker" "video" "render" "gamemode" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tree
     ];
@@ -54,7 +48,7 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ]; 
   environment.systemPackages = with pkgs; [
     neovim
-    firefox
+    helium
     wget
     git
     fastfetch
@@ -76,8 +70,13 @@
     slurp
     satty
     wl-clipboard
+    prismlauncher
+    glfw-minecraft
   ];
 
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+  };
 
   _module.args.nixcordPkgs = pkgs; 
   
@@ -130,12 +129,14 @@
     dates = "weekly";
     options = "--delete-older-than 7d";
   };
-
-  services.thermald.enable = true;
+  
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = true;
 
-  
+  programs.gamemode = {
+    enable = true;
+    enableRenice = true;
+  };  
 
   # !!!DO NOT TOUCH!!!
   system.stateVersion = "25.11"; # Did you read the comment?
