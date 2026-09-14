@@ -1,145 +1,153 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   imports =
-    [ 
+    [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      (builtins.fetchGit { url = "https://github.com/FlameFlag/nixcord.git"; ref = "main"; } + /modules/nixos)
     ];
 
-  boot.loader.limine.enable = true;
-  boot.loader.efi = {
-    canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot/efi";
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.initrd.kernelModules = [ "amdgpu" ];
 
-  boot.kernelPackages = pkgs.linuxPackages_zen;
-  
-  networking.hostName = "nixos-btw";
+  networking.hostName = "nixos-btw"; # Define your hostname.
+
 
   networking.networkmanager.enable = true;
-  
 
   time.timeZone = "Asia/Baghdad";
 
-
   i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    font = "Lat2-Terminus28";
-    keyMap = "us";
+
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
   };
 
-
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-
-  users.users.seoz = {
+  users.users."seoz" = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "video" "render" "gamemode" ]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-      tree
-    ];
-  };
-  nix.settings.experimental-features = [ "nix-command" "flakes" ]; 
-  environment.systemPackages = with pkgs; [
-    neovim
-    helium
-    wget
-    git
-    fastfetch
-    dysk
-    bibata-cursors
-    bluetui
-    wiremix
-    nerd-fonts.jetbrains-mono
-    obs-studio
-    zed-editor
-    btop
-    mpv
-    ghostty
-    fuzzel
-    waybar
-    swaync
-    mangowc
-    grim
-    slurp
-    satty
-    wl-clipboard
-    prismlauncher
-    glfw-minecraft
-  ];
-
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-  };
-
-  _module.args.nixcordPkgs = pkgs; 
-  
-  programs.nixcord = {
-    enable = true;
-    user = "seoz";
-    discord = {
-      enable = true;
-      openASAR.enable = true;
-      vencord.enable = false;
-      equicord.enable = true;
-    };
-
-    config = {
-      useQuickCss = true;
-    };
+    description = "seoz";
+    extraGroups = [ "networkmanager" "wheel" ];
+    packages = with pkgs; [];
   };
 
   nixpkgs.config.allowUnfree = true;
+
+  programs.hyprland.enable = true;
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   hardware.graphics.enable = true;
   hardware.amdgpu.opencl.enable = true;
   hardware.graphics.enable32Bit = true;
 
+  environment.systemPackages = with pkgs; [
+    neovim
+    git
+    fastfetch
+    dysk
+    alacritty
+    firefox
+    noctalia
+    hyprmod
+    bibata-cursors
+    mpv
+    btop
+    equibop
+    nwg-look
+    adw-gtk3
+    whitesur-icon-theme
+    distrobox
+    podman
+    nautilus
+    pear-desktop
+    prismlauncher
+    cloudflare-warp
+    comma
+    eza
+    bat
+    localsend
+    nix-index
+    gcc
+    gnumake
+    unzip
+    ripgrep
+    fd
+    nodejs
+    tree-sitter
+    obs-studio
+  ];
+
+  fonts.packages = with pkgs; [
+    victor-mono
+    nerd-fonts.symbols-only
+  ];
+
+  services.ollama = {
+    enable = true;
+    package  = pkgs.ollama-rocm;
+    # rocmOverrideGfx = "12.0.0";
+  };
+
+  programs.mtr.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
+
   services.openssh.enable = true;
-  services.envfs.enable = true;
-  hardware.bluetooth.enable = true;
-  services.flatpak.enable = true;
-  # system.copySystemConfiguration = true;
   services.displayManager.ly.enable = true;
-  virtualisation.docker.enable = true;
+  services.flatpak.enable = true;
+  services.cloudflare-warp.enable = true;
+  virtualisation.podman.enable = true;
+  security.polkit.enable = true;
+  hardware.pulseaudio.enable = false;
 
-  programs.nix-ld = {
+  services.pipewire = {
     enable = true;
-    libraries = with pkgs; [
-      glib
-      expat
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true; # Emulates PulseAudio so your apps still have sound
+    jack.enable = true;
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-gtk
     ];
+    configPackages = [
+      pkgs.hyprland
+    ];
+    config = {
+      hyprland = {
+        default = [ "hyprland" "gtk" ];
+      };
+      common = {
+        default = [ "gtk" ];
+      };
+    };
   };
-
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 50;
-  };
-
-  nix.settings.auto-optimise-store = true;
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 7d";
-  };
-  
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-  hardware.cpu.intel.updateMicrocode = true;
 
   programs.gamemode = {
     enable = true;
     enableRenice = true;
-  };  
+  };
 
-  # !!!DO NOT TOUCH!!!
-  system.stateVersion = "25.11"; # Did you read the comment?
+
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
+    ];
+  };
+
+  system.copySystemConfiguration = true;
+
+  system.stateVersion = "26.05"; # Did you read the comment?
 
 }
-
